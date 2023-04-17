@@ -1,0 +1,42 @@
+# 这是一个用于验证keepalived+nginx的编排文件
+# 这是一个docker compose编排文件
+
+version: "3"
+  # 独立ip keepalived
+networks:
+  keepalived:
+    driver: bridge
+    ipam: 
+      config:
+        - subnet: 172.20.1.0/24
+services:
+  nginx-main:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./nginx-main-index.html:/usr/share/nginx/html/index.html:ro
+      - ./keepalived-master.conf:/etc/keepalived/keepalived.conf:ro
+    networks:
+      keepalived:
+        ipv4_address: 172.20.1.4
+    extra_hosts:
+      - "keepalivedmaster:172.20.1.2"
+      - "keepalivedslave:172.20.1.3"
+      - "nginxmaster:172.20.1.4"
+      - "nginxbackup:172.20.1.5"
+  nginx-backup:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./nginx-backup-index.html:/usr/share/nginx/html/index.html:ro
+      - ./keepalived-slave.conf:/etc/keepalived/keepalived.conf:ro
+    networks:
+      keepalived:
+        ipv4_address: 172.20.1.5
+    extra_hosts:
+      - "keepalivedmaster:172.20.1.2"
+      - "keepalivedslave:172.20.1.3"
+      - "nginxmaster:172.20.1.4"
+      - "nginxbackup:172.20.1.5"
