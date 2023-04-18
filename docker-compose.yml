@@ -14,6 +14,7 @@ services:
     build:
       context: ./
       dockerfile: ./Dockerfile
+    privileged: true
     volumes:
       - ./nginx-main-index.html:/usr/share/nginx/html/index.html:ro
       - ./keepalived-master.conf:/etc/keepalived/keepalived.conf:ro
@@ -29,6 +30,7 @@ services:
     build:
       context: ./
       dockerfile: ./Dockerfile
+    privileged: true
     volumes:
       - ./nginx-backup-index.html:/usr/share/nginx/html/index.html:ro
       - ./keepalived-slave.conf:/etc/keepalived/keepalived.conf:ro
